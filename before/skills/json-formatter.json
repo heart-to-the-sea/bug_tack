@@ -1,0 +1,13 @@
+{
+  "name": "json-formatter",
+  "description": "专门用于JSON数据的格式化和验证",
+  "version": "1.0.0",
+  "instructions": [
+    "1. 接收JSON字符串或文件",
+    "2. 验证JSON格式是否正确",
+    "3. 对JSON进行格式化（缩进美化）",
+    "4. 检查JSON Schema是否符合预期",
+    "5. 输出格式化后的结果"
+  ],
+  "capabilities": ["JSON验证", "JSON格式化", "JSON压缩", "Schema验证"]
+}

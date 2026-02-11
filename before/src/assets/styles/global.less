@@ -1,0 +1,292 @@
+// 全局样式
+@import "./variables.less";
+@import "./mixins.less";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: @font-family;
+  font-size: 14px;
+  color: @text-primary;
+  background-color: @bg-color;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: @primary-color;
+  text-decoration: none;
+  transition: color @transition-fast;
+
+  &:hover {
+    color: @primary-hover;
+  }
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+
+  &:hover {
+    background: #a8a8a8;
+  }
+}
+
+// 通用页面布局
+.page-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  .flex-between();
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid @border-color;
+
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: @text-primary;
+  }
+}
+
+.page-content {
+  background-color: @bg-white;
+  border-radius: @border-radius-lg;
+  box-shadow: @box-shadow;
+  padding: 24px;
+}
+
+// 表格样式
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid @border-color;
+  }
+
+  th {
+    background-color: @bg-light;
+    font-weight: 600;
+    color: @text-secondary;
+  }
+
+  tbody tr {
+    transition: background-color @transition-fast;
+
+    &:hover {
+      background-color: @bg-color;
+    }
+  }
+}
+
+// 状态标签
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: @border-radius-sm;
+
+  &.status-pending {
+    background-color: #fff7e6;
+    color: #d46b08;
+  }
+
+  &.status-processing {
+    background-color: #e6f7ff;
+    color: #1890ff;
+  }
+
+  &.status-completed {
+    background-color: #f6ffed;
+    color: #52c41a;
+  }
+
+  &.status-rejected {
+    background-color: #fff2f0;
+    color: #ff4d4f;
+  }
+}
+
+// 表单样式
+.form-item {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: @text-primary;
+  }
+
+  .form-input {
+    .input-base();
+  }
+
+  .form-select {
+    .input-base();
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  .form-textarea {
+    .input-base();
+    min-height: 100px;
+    resize: vertical;
+  }
+}
+
+.form-actions {
+  .flex-between();
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid @border-color;
+}
+
+// 按钮组
+.btn-group {
+  display: flex;
+  gap: 12px;
+
+  .btn-primary();
+  .btn-secondary();
+}
+
+// 搜索栏
+.search-bar {
+  .flex-between();
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: @bg-light;
+  border-radius: @border-radius;
+
+  .search-input {
+    .input-base();
+    width: 300px;
+  }
+
+  .search-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+// 空状态
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: @text-disabled;
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .empty-text {
+    font-size: 14px;
+  }
+}
+
+// 弹窗遮罩
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  .card();
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  .flex-between();
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid @border-color;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: @text-disabled;
+    font-size: 20px;
+
+    &:hover {
+      color: @text-primary;
+    }
+  }
+}
+
+.modal-body {
+  margin-bottom: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
