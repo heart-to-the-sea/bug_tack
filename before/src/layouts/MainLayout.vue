@@ -55,31 +55,31 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
-import { useRoute } from "vue-router";
+import { computed, defineComponent } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
-  name: "MainLayout",
+  name: 'MainLayout',
   setup() {
-    const route = useRoute();
+    const route = useRoute()
 
     const pageTitles: Record<string, string> = {
-      "/": "仪表盘",
-      "/bugs": "问题管理",
-      "/projects": "项目管理",
-      "/test": "快速测试",
-      "/todo": "我的待办",
-    };
+      '/': '仪表盘',
+      '/bugs': '问题管理',
+      '/projects': '项目管理',
+      '/test': '快速测试',
+      '/todo': '我的待办',
+    }
 
     const currentPageTitle = computed(() => {
-      return pageTitles[route.path] || "Bug Track";
-    });
+      return pageTitles[route.path] || 'Bug Track'
+    })
 
     return {
       currentPageTitle,
-    };
+    }
   },
-});
+})
 </script>
 
 <style lang="less" scoped>

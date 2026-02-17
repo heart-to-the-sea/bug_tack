@@ -25,11 +25,7 @@
             <label>项目 <span class="required">*</span></label>
             <select class="form-select" v-model="form.project">
               <option value="">请选择项目</option>
-              <option
-                v-for="project in projects"
-                :key="project"
-                :value="project"
-              >
+              <option v-for="project in projects" :key="project" :value="project">
                 {{ project }}
               </option>
             </select>
@@ -145,16 +141,10 @@
           />
           <div class="upload-icon">📎</div>
           <div class="upload-text">点击或拖拽文件到此处上传</div>
-          <div class="upload-hint">
-            支持 png、jpg、gif、txt、log 格式，单个文件不超过 10MB
-          </div>
+          <div class="upload-hint">支持 png、jpg、gif、txt、log 格式，单个文件不超过 10MB</div>
         </div>
         <div class="file-list" v-if="form.attachments.length">
-          <div
-            class="file-item"
-            v-for="(file, index) in form.attachments"
-            :key="index"
-          >
+          <div class="file-item" v-for="(file, index) in form.attachments" :key="index">
             <span class="file-icon">📄</span>
             <span class="file-name">{{ file.name }}</span>
             <span class="file-size">{{ formatFileSize(file.size) }}</span>
@@ -172,98 +162,93 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { defineComponent, ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
 interface Attachment {
-  name: string;
-  size: number;
+  name: string
+  size: number
 }
 
 export default defineComponent({
-  name: "EditBugView",
+  name: 'EditBugView',
   setup() {
-    const route = useRoute();
-    const bugId = route.params.id as string;
-    const fileInput = ref<HTMLInputElement | null>(null);
+    const route = useRoute()
+    const bugId = route.params.id as string
+    const fileInput = ref<HTMLInputElement | null>(null)
 
-    const projects = ref([
-      "电商平台v2.0",
-      "小程序优化",
-      "支付系统升级",
-      "后台管理系统",
-    ]);
+    const projects = ref(['电商平台v2.0', '小程序优化', '支付系统升级', '后台管理系统'])
 
     const envLabels: Record<string, string> = {
-      dev: "开发环境",
-      test: "测试环境",
-      beta: "Beta环境",
-      prod: "线上环境",
-    };
+      dev: '开发环境',
+      test: '测试环境',
+      beta: 'Beta环境',
+      prod: '线上环境',
+    }
 
     const form = ref({
-      title: "用户登录接口返回500错误",
-      project: "电商平台v2.0",
-      priority: "high",
-      type: "bug",
-      status: "processing",
-      environment: "test",
-      version: "v2.0.1",
-      module: "用户中心",
-      assignee: "张三",
+      title: '用户登录接口返回500错误',
+      project: '电商平台v2.0',
+      priority: 'high',
+      type: 'bug',
+      status: 'processing',
+      environment: 'test',
+      version: 'v2.0.1',
+      module: '用户中心',
+      assignee: '张三',
       description: `1. 问题描述\n用户在使用手机号+验证码登录时，系统返回500错误\n\n2. 复现步骤\n- 打开登录页面\n- 输入手机号\n- 点击获取验证码\n- 输入验证码\n- 点击登录\n- 返回500错误\n\n3. 期望结果\n正常登录并跳转到首页\n\n4. 实际结果\n系统返回500 Internal Server Error\n\n5. 后台日志\n[ERROR] Database connection timeout`,
-      changeReason: "",
+      changeReason: '',
       attachments: [
-        { name: "bug_screenshot.png", size: 262144 },
-        { name: "error_log.txt", size: 12288 },
+        { name: 'bug_screenshot.png', size: 262144 },
+        { name: 'error_log.txt', size: 12288 },
       ] as Attachment[],
-    });
+    })
 
     onMounted(() => {
       // TODO: 根据 bugId 获取问题详情
-      console.log("加载问题:", bugId);
-    });
+      console.log('加载问题:', bugId)
+    })
 
     const triggerUpload = () => {
-      fileInput.value?.click();
-    };
+      fileInput.value?.click()
+    }
 
     const handleFileChange = (event: Event) => {
-      const target = event.target as HTMLInputElement;
+      const target = event.target as HTMLInputElement
       if (target.files) {
         for (let i = 0; i < target.files.length; i++) {
-          const file = target.files[i];
+          const file = target.files[i]
           form.value.attachments.push({
             name: file.name,
             size: file.size,
-          });
+          })
         }
       }
-    };
+    }
 
     const removeFile = (index: number) => {
-      form.value.attachments.splice(index, 1);
-    };
+      form.value.attachments.splice(index, 1)
+    }
 
     const formatFileSize = (bytes: number) => {
-      if (bytes < 1024) return bytes + " B";
-      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-    };
+      if (bytes < 1024) return bytes + ' B'
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+    }
 
     const handleSubmit = () => {
       if (!form.value.title || !form.value.project) {
-        alert("请填写必填项");
-        return;
+        alert('请填写必填项')
+        return
       }
       if (!form.value.changeReason) {
-        alert("请填写修改原因");
-        return;
+        alert('请填写修改原因')
+        return
       }
-      console.log("保存修改:", form.value);
-      alert("修改保存成功！");
+      console.log('保存修改:', form.value)
+      alert('修改保存成功！')
       // TODO: 调用API保存修改
-    };
+    }
 
     return {
       bugId,
@@ -276,9 +261,9 @@ export default defineComponent({
       removeFile,
       formatFileSize,
       handleSubmit,
-    };
+    }
   },
-});
+})
 </script>
 
 <style lang="less" scoped>

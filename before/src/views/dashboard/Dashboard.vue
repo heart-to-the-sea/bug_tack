@@ -2,10 +2,7 @@
   <div class="dashboard">
     <div class="stats-grid">
       <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(0, 196, 196, 0.1); color: #00c4c4"
-        >
+        <div class="stat-icon" style="background-color: rgba(0, 196, 196, 0.1); color: #00c4c4">
           📝
         </div>
         <div class="stat-content">
@@ -14,10 +11,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(255, 153, 0, 0.1); color: #ff9900"
-        >
+        <div class="stat-icon" style="background-color: rgba(255, 153, 0, 0.1); color: #ff9900">
           ⏳
         </div>
         <div class="stat-content">
@@ -26,10 +20,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(24, 144, 255, 0.1); color: #1890ff"
-        >
+        <div class="stat-icon" style="background-color: rgba(24, 144, 255, 0.1); color: #1890ff">
           🔧
         </div>
         <div class="stat-content">
@@ -38,10 +29,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(82, 196, 26, 0.1); color: #52c41a"
-        >
+        <div class="stat-icon" style="background-color: rgba(82, 196, 26, 0.1); color: #52c41a">
           ✅
         </div>
         <div class="stat-content">
@@ -65,10 +53,7 @@
             </div>
             <div class="issue-meta">
               <span class="issue-project">{{ issue.project }}</span>
-              <span
-                class="issue-priority"
-                :class="'priority-' + issue.priority"
-              >
+              <span class="issue-priority" :class="'priority-' + issue.priority">
                 {{ priorityLabels[issue.priority] }}
               </span>
             </div>
@@ -85,10 +70,7 @@
           <div class="todo-item" v-for="todo in myTodos" :key="todo.id">
             <input type="checkbox" class="todo-checkbox" />
             <span class="todo-title">{{ todo.title }}</span>
-            <span
-              class="todo-deadline"
-              :class="{ overdue: isOverdue(todo.deadline) }"
-            >
+            <span class="todo-deadline" :class="{ overdue: isOverdue(todo.deadline) }">
               {{ formatDate(todo.deadline) }}
             </span>
           </div>
@@ -123,87 +105,87 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref } from 'vue'
 
 interface Issue {
-  id: number;
-  title: string;
-  project: string;
-  priority: string;
+  id: number
+  title: string
+  project: string
+  priority: string
 }
 
 interface Todo {
-  id: number;
-  title: string;
-  deadline: string;
+  id: number
+  title: string
+  deadline: string
 }
 
 export default defineComponent({
-  name: "DashboardView",
+  name: 'DashboardView',
   setup() {
     const stats = ref({
       total: 156,
       pending: 23,
       processing: 45,
       completed: 88,
-    });
+    })
 
     const priorityLabels: Record<string, string> = {
-      high: "高",
-      medium: "中",
-      low: "低",
-    };
+      high: '高',
+      medium: '中',
+      low: '低',
+    }
 
     const recentIssues = ref<Issue[]>([
       {
         id: 156,
-        title: "用户登录接口返回500错误",
-        project: "电商平台v2.0",
-        priority: "high",
+        title: '用户登录接口返回500错误',
+        project: '电商平台v2.0',
+        priority: 'high',
       },
       {
         id: 155,
-        title: "订单列表分页加载缓慢",
-        project: "电商平台v2.0",
-        priority: "medium",
+        title: '订单列表分页加载缓慢',
+        project: '电商平台v2.0',
+        priority: 'medium',
       },
       {
         id: 154,
-        title: "购物车数量更新异常",
-        project: "小程序优化",
-        priority: "high",
+        title: '购物车数量更新异常',
+        project: '小程序优化',
+        priority: 'high',
       },
       {
         id: 153,
-        title: "支付回调地址配置错误",
-        project: "支付系统升级",
-        priority: "low",
+        title: '支付回调地址配置错误',
+        project: '支付系统升级',
+        priority: 'low',
       },
       {
         id: 152,
-        title: "商品详情页图片加载失败",
-        project: "电商平台v2.0",
-        priority: "medium",
+        title: '商品详情页图片加载失败',
+        project: '电商平台v2.0',
+        priority: 'medium',
       },
-    ]);
+    ])
 
     const myTodos = ref<Todo[]>([
-      { id: 1, title: "修复用户登录接口500错误", deadline: "2026-02-12" },
-      { id: 2, title: "优化订单列表查询SQL", deadline: "2026-02-13" },
-      { id: 3, title: "更新支付回调配置", deadline: "2026-02-15" },
-      { id: 4, title: "添加单元测试用例", deadline: "2026-02-10" },
-    ]);
+      { id: 1, title: '修复用户登录接口500错误', deadline: '2026-02-12' },
+      { id: 2, title: '优化订单列表查询SQL', deadline: '2026-02-13' },
+      { id: 3, title: '更新支付回调配置', deadline: '2026-02-15' },
+      { id: 4, title: '添加单元测试用例', deadline: '2026-02-10' },
+    ])
 
     const formatDate = (dateStr: string) => {
-      const date = new Date(dateStr);
-      return `${date.getMonth() + 1}/${date.getDate()}`;
-    };
+      const date = new Date(dateStr)
+      return `${date.getMonth() + 1}/${date.getDate()}`
+    }
 
     const isOverdue = (dateStr: string) => {
-      return new Date(dateStr) < new Date();
-    };
+      return new Date(dateStr) < new Date()
+    }
 
-    const showCreateBug = ref(false);
+    const showCreateBug = ref(false)
 
     return {
       stats,
@@ -213,9 +195,9 @@ export default defineComponent({
       formatDate,
       isOverdue,
       showCreateBug,
-    };
+    }
   },
-});
+})
 </script>
 
 <style lang="less" scoped>

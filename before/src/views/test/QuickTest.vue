@@ -1,253 +1,266 @@
+<!--
+  快速测试页面
+  V1.2 变量版本号: v1.2.0
+  V1.2 方法版本号: v1.2.0
+-->
 <template>
   <div class="quick-test">
     <div class="page-header">
       <h1>快速测试</h1>
       <div class="header-actions">
-        <select class="env-select" v-model="selectedEnv">
-          <option value="test">测试环境</option>
-          <option value="beta">Beta环境</option>
-          <option value="prod">线上环境</option>
-        </select>
+        <el-switch v-model="autoJump" active-text="自动跳转" inactive-text="手动提交" />
+        <el-select v-model="selectedEnv" style="width: 140px">
+          <el-option label="测试环境" value="test" />
+          <el-option label="Beta环境" value="beta" />
+          <el-option label="线上环境" value="prod" />
+        </el-select>
       </div>
     </div>
 
-    <div class="test-progress">
+    <el-card class="test-progress" shadow="never">
       <div class="progress-info">
-        <span class="progress-label"
-          >当前环境：{{ envLabels[selectedEnv] }}</span
-        >
-        <span class="progress-count"
-          >完成 {{ completedCount }} / {{ totalCount }}</span
-        >
+        <span>当前环境：{{ envLabels[selectedEnv] }}</span>
+        <span class="progress-count">完成 {{ completedCount }} / {{ totalCount }}</span>
       </div>
-      <div class="progress-bar">
-        <div
-          class="progress-fill"
-          :style="{ width: progressPercent + '%' }"
-        ></div>
-      </div>
-    </div>
+      <el-progress :percentage="progressPercent" :stroke-width="8" />
+    </el-card>
 
-    <div class="test-list">
-      <div
-        class="test-item"
-        v-for="(test, index) in testQueue"
-        :key="test.id"
-        :class="{
-          active: currentIndex === index,
-          completed: test.status === 'passed',
-        }"
-        @click="currentIndex = index"
-      >
-        <div class="test-number">{{ index + 1 }}</div>
-        <div class="test-content">
-          <div class="test-header">
-            <span class="test-bug-id">#{{ test.bugId }}</span>
-            <span class="test-title">{{ test.title }}</span>
+    <el-row :gutter="20">
+      <el-col :span="8">
+        <el-card class="test-list-card" shadow="never">
+          <template #header>
+            <span>测试队列</span>
+          </template>
+          <div class="test-list">
+            <div
+              class="test-item"
+              v-for="(test, index) in testQueue"
+              :key="test.id"
+              :class="{
+                active: currentIndex === index,
+                completed: test.status === 'passed',
+              }"
+              @click="currentIndex = index"
+            >
+              <div class="test-number">{{ index + 1 }}</div>
+              <div class="test-content">
+                <div class="test-header">
+                  <span class="test-bug-id">#{{ test.bugId }}</span>
+                  <span class="test-title">{{ test.title }}</span>
+                </div>
+                <div class="test-meta">
+                  <span>{{ test.project }}</span>
+                </div>
+              </div>
+              <el-icon v-if="test.status === 'passed'" class="test-status"><Check /></el-icon>
+            </div>
           </div>
-          <div class="test-meta">
-            <span class="test-project">{{ test.project }}</span>
-            <span class="test-assignee">负责人：{{ test.assignee }}</span>
-          </div>
-        </div>
-        <div class="test-status" v-if="test.status === 'passed'">✅</div>
-      </div>
-    </div>
+        </el-card>
+      </el-col>
 
-    <div class="test-detail" v-if="currentTest">
-      <div class="detail-header">
-        <h3>测试项详情 - #{{ currentTest.bugId }}</h3>
-        <span class="test-env-badge">{{ envLabels[selectedEnv] }}</span>
-      </div>
-      <div class="detail-content">
-        <div class="detail-row">
-          <span class="detail-label">问题标题：</span>
-          <span class="detail-value">{{ currentTest.title }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">所属项目：</span>
-          <span class="detail-value">{{ currentTest.project }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">问题描述：</span>
-          <span class="detail-value">{{ currentTest.description }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">关联附件：</span>
-          <span class="detail-value">
-            <a href="#" class="attachment-link">📎 bug_screenshot.png</a>
-          </span>
-        </div>
-      </div>
-      <div class="detail-actions">
-        <div class="action-label">测试结果：</div>
-        <div class="action-btns">
-          <button
-            class="action-btn pass"
-            :class="{ active: testResult === 'passed' }"
-            @click="testResult = 'passed'"
-          >
-            ✅ 测试通过
-          </button>
-          <button
-            class="action-btn fail"
-            :class="{ active: testResult === 'failed' }"
-            @click="testResult = 'failed'"
-          >
-            ❌ 测试未通过
-          </button>
-        </div>
-        <div class="fail-reason" v-if="testResult === 'failed'">
-          <label>未通过原因：</label>
-          <textarea
-            class="reason-input"
-            v-model="failReason"
-            placeholder="请描述未通过的原因..."
-          ></textarea>
-        </div>
-      </div>
-      <div class="detail-footer">
-        <div class="keyboard-hint">
-          <span>⌨️ 快捷键：← 上一项 | → 下一项 | P 通过 | F 未通过</span>
-        </div>
-        <div class="footer-btns">
-          <button
-            class="btn-secondary"
-            @click="prevTest"
-            :disabled="currentIndex === 0"
-          >
-            ← 上一项
-          </button>
-          <button class="btn-primary" @click="submitTest">
-            {{ testResult === "failed" ? "提交未通过" : "提交并下一项" }} →
-          </button>
-        </div>
-      </div>
-    </div>
+      <el-col :span="16" v-if="currentTest">
+        <el-card class="test-detail" shadow="never">
+          <template #header>
+            <div class="detail-header">
+              <span>测试项详情 - #{{ currentTest.bugId }}</span>
+              <el-tag type="primary">{{ envLabels[selectedEnv] }}</el-tag>
+            </div>
+          </template>
+
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="问题标题">{{ currentTest.title }}</el-descriptions-item>
+            <el-descriptions-item label="所属项目">{{ currentTest.project }}</el-descriptions-item>
+            <el-descriptions-item label="问题描述">{{
+              currentTest.description
+            }}</el-descriptions-item>
+            <el-descriptions-item label="关联附件">
+              <el-link type="primary">📎 bug_screenshot.png</el-link>
+            </el-descriptions-item>
+          </el-descriptions>
+
+          <div class="detail-actions">
+            <div class="action-label">测试结果：</div>
+            <el-radio-group v-model="testResult">
+              <el-radio-button label="passed">
+                <el-icon><Check /></el-icon>
+                测试通过
+              </el-radio-button>
+              <el-radio-button label="failed">
+                <el-icon><Close /></el-icon>
+                测试未通过
+              </el-radio-button>
+            </el-radio-group>
+
+            <div v-if="testResult === 'failed'" class="fail-reason">
+              <span>未通过原因：</span>
+              <el-input
+                v-model="failReason"
+                type="textarea"
+                :rows="3"
+                placeholder="请描述未通过的原因..."
+              />
+            </div>
+          </div>
+
+          <div class="detail-footer">
+            <div class="keyboard-hint">
+              <span>快捷键：← 上一项 | → 下一项 | P 通过 | F 未通过</span>
+            </div>
+            <div class="footer-btns">
+              <el-button :disabled="currentIndex === 0" @click="prevTest">← 上一项</el-button>
+              <el-button type="primary" @click="submitTest">
+                {{ testResult === 'failed' ? '提交未通过' : '提交并下一项' }} →
+              </el-button>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from "vue";
+import { defineComponent, ref, computed, watch } from 'vue' // V1.2.0
+import { ElMessage } from 'element-plus' // V1.2.0
+import { Check, Close } from '@element-plus/icons-vue' // V1.2.0
 
 interface TestItem {
-  id: number;
-  bugId: number;
-  title: string;
-  project: string;
-  assignee: string;
-  description: string;
-  status: string;
-}
+  // V1.2.0
+  id: number // V1.2.0
+  bugId: number // V1.2.0
+  title: string // V1.2.0
+  project: string // V1.2.0
+  assignee: string // V1.2.0
+  description: string // V1.2.0
+  status: string // V1.2.0
+} // V1.2.0
 
 export default defineComponent({
-  name: "QuickTest",
+  name: 'QuickTest',
+  components: {
+    Check,
+    Close,
+  },
   setup() {
-    const selectedEnv = ref("test");
-    const currentIndex = ref(0);
-    const testResult = ref<string | null>(null);
-    const failReason = ref("");
+    const selectedEnv = ref('test') // V1.2.0
+    const currentIndex = ref(0) // V1.2.0
+    const testResult = ref<string | null>(null) // V1.2.0
+    const failReason = ref('') // V1.2.0
+    const autoJump = ref(true) // V1.2.0 自动跳转开关
 
     const envLabels: Record<string, string> = {
-      test: "测试环境",
-      beta: "Beta环境",
-      prod: "线上环境",
-    };
+      // V1.2.0
+      test: '测试环境', // V1.2.0
+      beta: 'Beta环境', // V1.2.0
+      prod: '线上环境', // V1.2.0
+    }
 
     const testQueue = ref<TestItem[]>([
+      // V1.2.0
       {
         id: 1,
         bugId: 154,
-        title: "购物车数量更新异常",
-        project: "小程序优化",
-        assignee: "王五",
+        title: '购物车数量更新异常',
+        project: '小程序优化',
+        assignee: '王五',
         description:
-          "在购物车页面，修改商品数量后，页面显示的总数未正确更新，需要刷新页面才能看到正确的数量。",
-        status: "pending",
+          '在购物车页面，修改商品数量后，页面显示的总数未正确更新，需要刷新页面才能看到正确的数量。',
+        status: 'pending',
       },
       {
         id: 2,
         bugId: 151,
-        title: "用户注册短信验证码发送失败",
-        project: "电商平台v2.0",
-        assignee: "李四",
+        title: '用户注册短信验证码发送失败',
+        project: '电商平台v2.0',
+        assignee: '李四',
         description:
-          "新用户注册时，点击发送短信验证码按钮后，提示发送失败，但后台日志显示验证码已发送成功。",
-        status: "pending",
+          '新用户注册时，点击发送短信验证码按钮后，提示发送失败，但后台日志显示验证码已发送成功。',
+        status: 'pending',
       },
       {
         id: 3,
         bugId: 148,
-        title: "优惠券列表显示错误",
-        project: "电商平台v2.0",
-        assignee: "张三",
-        description:
-          "用户拥有的优惠券在列表页显示异常，部分优惠券显示为空白或重复显示。",
-        status: "pending",
+        title: '优惠券列表显示错误',
+        project: '电商平台v2.0',
+        assignee: '张三',
+        description: '用户拥有的优惠券在列表页显示异常，部分优惠券显示为空白或重复显示。',
+        status: 'pending',
       },
       {
         id: 4,
         bugId: 145,
-        title: "地址选择器加载缓慢",
-        project: "小程序优化",
-        assignee: "王五",
-        description:
-          "在结算页面打开地址选择器时，需要等待3-5秒才能加载完所有地址数据。",
-        status: "pending",
+        title: '地址选择器加载缓慢',
+        project: '小程序优化',
+        assignee: '王五',
+        description: '在结算页面打开地址选择器时，需要等待3-5秒才能加载完所有地址数据。',
+        status: 'pending',
       },
-    ]);
+    ]) // V1.2.0
 
-    const currentTest = computed(() => testQueue.value[currentIndex.value]);
+    const currentTest = computed(() => testQueue.value[currentIndex.value])
 
     const completedCount = computed(() => {
-      return testQueue.value.filter((t) => t.status === "passed").length;
-    });
+      return testQueue.value.filter((t) => t.status === 'passed').length
+    })
 
-    const totalCount = computed(() => testQueue.value.length);
+    const totalCount = computed(() => testQueue.value.length)
 
     const progressPercent = computed(() => {
-      return Math.round((completedCount.value / totalCount.value) * 100);
-    });
+      return totalCount.value > 0 ? Math.round((completedCount.value / totalCount.value) * 100) : 0
+    })
 
     const prevTest = () => {
       if (currentIndex.value > 0) {
-        currentIndex.value--;
-        testResult.value = null;
-        failReason.value = "";
+        currentIndex.value--
+        testResult.value = null
+        failReason.value = ''
       }
-    };
+    }
 
     const submitTest = () => {
       if (!testResult.value) {
-        alert("请选择测试结果");
-        return;
+        ElMessage.warning('请选择测试结果')
+        return
       }
-      if (testResult.value === "failed" && !failReason.value) {
-        alert("请填写未通过原因");
-        return;
+      if (testResult.value === 'failed' && !failReason.value) {
+        ElMessage.warning('请填写未通过原因')
+        return
       }
-      if (testResult.value === "passed") {
-        testQueue.value[currentIndex.value].status = "passed";
-      }
-      if (currentIndex.value < testQueue.value.length - 1) {
-        currentIndex.value++;
-        testResult.value = null;
-        failReason.value = "";
+      if (testResult.value === 'passed') {
+        testQueue.value[currentIndex.value].status = 'passed'
+        if (autoJump.value) {
+          if (currentIndex.value < testQueue.value.length - 1) {
+            currentIndex.value++
+            testResult.value = null
+            failReason.value = ''
+          } else {
+            ElMessage.success('所有测试项已完成！')
+          }
+        } else {
+          if (currentIndex.value < testQueue.value.length - 1) {
+            currentIndex.value++
+            testResult.value = null
+            failReason.value = ''
+          } else {
+            ElMessage.success('所有测试项已完成！')
+          }
+        }
       } else {
-        alert("所有测试项已完成！");
+        ElMessage.info('测试未通过，请修改后重新提交')
       }
-    };
+    }
 
     watch(currentIndex, () => {
-      testResult.value = null;
-      failReason.value = "";
-    });
+      testResult.value = null
+      failReason.value = ''
+    })
 
     return {
       selectedEnv,
       currentIndex,
       testResult,
       failReason,
+      autoJump,
       envLabels,
       testQueue,
       currentTest,
@@ -256,9 +269,9 @@ export default defineComponent({
       progressPercent,
       prevTest,
       submitTest,
-    };
+    }
   },
-});
+})
 </script>
 
 <style lang="less" scoped>
@@ -278,69 +291,40 @@ export default defineComponent({
     font-weight: 600;
     color: #333;
   }
-
-  .env-select {
-    padding: 8px 16px;
-    border: 1px solid #e8e8e8;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: #fff;
-    cursor: pointer;
-  }
 }
 
 .test-progress {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 16px 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
   .progress-info {
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
-
-    .progress-label {
-      font-size: 14px;
-      color: #666;
-    }
+    font-size: 14px;
+    color: #666;
 
     .progress-count {
-      font-size: 14px;
       color: #00c4c4;
       font-weight: 500;
     }
   }
-
-  .progress-bar {
-    height: 8px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    overflow: hidden;
-
-    .progress-fill {
-      height: 100%;
-      background-color: #00c4c4;
-      border-radius: 4px;
-      transition: width 0.3s;
-    }
-  }
 }
 
-.test-list {
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  margin-bottom: 20px;
+.test-list-card {
+  height: calc(100vh - 280px);
+  overflow-y: auto;
+
+  .test-list {
+    max-height: calc(100vh - 340px);
+    overflow-y: auto;
+  }
 }
 
 .test-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  gap: 12px;
+  padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -363,224 +347,105 @@ export default defineComponent({
   }
 
   .test-number {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background-color: #f0f0f0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     color: #666;
+    flex-shrink: 0;
   }
 
   .test-content {
     flex: 1;
+    min-width: 0;
 
     .test-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
+      gap: 8px;
+      margin-bottom: 4px;
 
       .test-bug-id {
         color: #00c4c4;
         font-weight: 500;
+        font-size: 13px;
+        flex-shrink: 0;
       }
 
       .test-title {
-        font-size: 14px;
+        font-size: 13px;
         color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
     .test-meta {
-      display: flex;
-      gap: 16px;
       font-size: 12px;
       color: #999;
     }
   }
 
   .test-status {
-    font-size: 20px;
+    color: #52c41a;
+    font-size: 18px;
+    flex-shrink: 0;
   }
 }
 
 .test-detail {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-}
-
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #f0f0f0;
-
-  h3 {
-    font-size: 16px;
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-weight: 600;
   }
 
-  .test-env-badge {
-    padding: 4px 10px;
-    background-color: #e6f7ff;
-    color: #1890ff;
-    border-radius: 4px;
-    font-size: 12px;
-  }
-}
+  .detail-actions {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fafafa;
+    border-radius: 8px;
 
-.detail-content {
-  padding: 20px;
-
-  .detail-row {
-    display: flex;
-    margin-bottom: 12px;
-
-    .detail-label {
-      width: 100px;
-      color: #999;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-
-    .detail-value {
-      flex: 1;
-      font-size: 14px;
+    .action-label {
+      font-weight: 500;
+      margin-bottom: 16px;
       color: #333;
+    }
 
-      .attachment-link {
-        color: #00c4c4;
+    .fail-reason {
+      margin-top: 16px;
+
+      span {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #666;
       }
     }
   }
-}
 
-.detail-actions {
-  padding: 20px;
-  background-color: #fafafa;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
-
-  .action-label {
-    font-weight: 500;
-    margin-bottom: 12px;
-    color: #333;
-  }
-
-  .action-btns {
+  .detail-footer {
     display: flex;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
 
-    .action-btn {
-      flex: 1;
-      padding: 12px 20px;
-      border: 2px solid #e8e8e8;
-      background-color: #fff;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &.pass.active {
-        border-color: #52c41a;
-        background-color: #f6ffed;
-        color: #52c41a;
-      }
-
-      &.fail.active {
-        border-color: #ff4d4f;
-        background-color: #fff2f0;
-        color: #ff4d4f;
-      }
-    }
-  }
-
-  .fail-reason {
-    margin-top: 16px;
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #666;
+    .keyboard-hint {
+      font-size: 13px;
+      color: #999;
     }
 
-    .reason-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #e8e8e8;
-      border-radius: 6px;
-      font-size: 14px;
-      min-height: 80px;
-      resize: vertical;
-      outline: none;
-
-      &:focus {
-        border-color: #00c4c4;
-      }
+    .footer-btns {
+      display: flex;
+      gap: 12px;
     }
-  }
-}
-
-.detail-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-
-  .keyboard-hint {
-    font-size: 13px;
-    color: #999;
-  }
-
-  .footer-btns {
-    display: flex;
-    gap: 12px;
-  }
-}
-
-.btn-primary {
-  padding: 10px 24px;
-  background-color: #00c4c4;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #00b0b0;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.btn-secondary {
-  padding: 10px 24px;
-  background-color: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-
-  &:hover {
-    border-color: #00c4c4;
-    color: #00c4c4;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 }
 </style>

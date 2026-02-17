@@ -3,12 +3,8 @@
     <div class="page-header">
       <button class="back-btn" @click="$router.back()">← 返回</button>
       <div class="header-actions">
-        <button class="btn-secondary" @click="showEditModal = true">
-          编辑
-        </button>
-        <button class="btn-primary" @click="showVerifyModal = true">
-          提交验证
-        </button>
+        <button class="btn-secondary" @click="showEditModal = true">编辑</button>
+        <button class="btn-primary" @click="showVerifyModal = true">提交验证</button>
       </div>
     </div>
 
@@ -109,10 +105,7 @@
                   环境：{{ envLabels[record.environment] }}
                 </div>
               </div>
-              <div
-                class="track-attachments"
-                v-if="record.attachments && record.attachments.length"
-              >
+              <div class="track-attachments" v-if="record.attachments && record.attachments.length">
                 <div class="attachment-label">附件：</div>
                 <a
                   v-for="(file, idx) in record.attachments"
@@ -136,13 +129,9 @@
         <div class="sidebar-section">
           <h4>快速操作</h4>
           <div class="quick-actions">
-            <button class="quick-btn" @click="showTransferModal = true">
-              🔄 转交他人
-            </button>
+            <button class="quick-btn" @click="showTransferModal = true">🔄 转交他人</button>
             <button class="quick-btn" @click="addToTodo">📋 添加到待办</button>
-            <button class="quick-btn" @click="showRelatedModal">
-              🔗 关联需求
-            </button>
+            <button class="quick-btn" @click="showRelatedModal">🔗 关联需求</button>
           </div>
         </div>
 
@@ -215,17 +204,11 @@
       </div>
     </div>
 
-    <div
-      class="modal-overlay"
-      v-if="showVerifyModal"
-      @click.self="showVerifyModal = false"
-    >
+    <div class="modal-overlay" v-if="showVerifyModal" @click.self="showVerifyModal = false">
       <div class="modal-content">
         <div class="modal-header">
           <h2>提交验证</h2>
-          <button class="modal-close" @click="showVerifyModal = false">
-            ×
-          </button>
+          <button class="modal-close" @click="showVerifyModal = false">×</button>
         </div>
         <div class="modal-body">
           <div class="form-item">
@@ -241,19 +224,11 @@
             <label>验证结果</label>
             <div class="radio-group">
               <label class="radio-item">
-                <input
-                  type="radio"
-                  v-model="verifyForm.result"
-                  value="passed"
-                />
+                <input type="radio" v-model="verifyForm.result" value="passed" />
                 <span class="radio-label pass">✅ 测试通过</span>
               </label>
               <label class="radio-item">
-                <input
-                  type="radio"
-                  v-model="verifyForm.result"
-                  value="failed"
-                />
+                <input type="radio" v-model="verifyForm.result" value="failed" />
                 <span class="radio-label fail">❌ 测试未通过</span>
               </label>
             </div>
@@ -283,9 +258,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn-secondary" @click="showVerifyModal = false">
-            取消
-          </button>
+          <button class="btn-secondary" @click="showVerifyModal = false">取消</button>
           <button class="btn-primary" @click="submitVerify">提交</button>
         </div>
       </div>
@@ -294,189 +267,189 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref } from 'vue'
 
 interface Attachment {
-  name: string;
-  url?: string;
-  size?: string;
+  name: string
+  url?: string
+  size?: string
 }
 
 interface TrackRecord {
-  type: string;
-  action: string;
-  user: string;
-  time: string;
-  content?: string;
-  environment?: string;
-  attachments?: Attachment[];
-  rejectFrom?: string;
-  rejectReason?: string;
+  type: string
+  action: string
+  user: string
+  time: string
+  content?: string
+  environment?: string
+  attachments?: Attachment[]
+  rejectFrom?: string
+  rejectReason?: string
 }
 
 interface VerifyStep {
-  name: string;
-  status: string;
-  operator?: string;
-  completedAt?: string;
-  comment?: string;
+  name: string
+  status: string
+  operator?: string
+  completedAt?: string
+  comment?: string
 }
 
 export default defineComponent({
-  name: "BugDetailView",
+  name: 'BugDetailView',
   setup() {
-    const showEditModal = ref(false);
-    const showVerifyModal = ref(false);
-    const showTransferModal = ref(false);
-    const showRelatedModal = ref(false);
+    const showEditModal = ref(false)
+    const showVerifyModal = ref(false)
+    const showTransferModal = ref(false)
+    const showRelatedModal = ref(false)
 
     const statusLabels: Record<string, string> = {
-      pending: "待分配",
-      processing: "处理中",
-      testing: "待验证",
-      verified: "已验证",
-      completed: "已修复",
-      rejected: "未通过",
-    };
+      pending: '待分配',
+      processing: '处理中',
+      testing: '待验证',
+      verified: '已验证',
+      completed: '已修复',
+      rejected: '未通过',
+    }
 
     const priorityLabels: Record<string, string> = {
-      high: "高",
-      medium: "中",
-      low: "低",
-    };
+      high: '高',
+      medium: '中',
+      low: '低',
+    }
 
     const envLabels: Record<string, string> = {
-      dev: "开发环境",
-      test: "测试环境",
-      beta: "Beta环境",
-      prod: "线上环境",
-    };
+      dev: '开发环境',
+      test: '测试环境',
+      beta: 'Beta环境',
+      prod: '线上环境',
+    }
 
     const bug = ref({
       id: 156,
-      title: "用户登录接口返回500错误",
-      status: "testing",
-      priority: "high",
-      type: "Bug",
-      project: "电商平台v2.0",
-      assignee: "张三",
-      creator: "李四",
-      environment: "test",
-      version: "v2.0.1",
-      createdAt: "2026-02-10 10:30",
+      title: '用户登录接口返回500错误',
+      status: 'testing',
+      priority: 'high',
+      type: 'Bug',
+      project: '电商平台v2.0',
+      assignee: '张三',
+      creator: '李四',
+      environment: 'test',
+      version: 'v2.0.1',
+      createdAt: '2026-02-10 10:30',
       description: `1. 问题描述\n用户在使用手机号+验证码登录时，系统返回500错误\n\n2. 复现步骤\n- 打开登录页面\n- 输入手机号\n- 点击获取验证码\n- 输入验证码\n- 点击登录\n- 返回500错误\n\n3. 期望结果\n正常登录并跳转到首页\n\n4. 实际结果\n系统返回500 Internal Server Error\n\n5. 后台日志\n[ERROR] Database connection timeout`,
       attachments: [
-        { name: "bug_screenshot.png", size: "256KB" },
-        { name: "error_log.txt", size: "12KB" },
+        { name: 'bug_screenshot.png', size: '256KB' },
+        { name: 'error_log.txt', size: '12KB' },
       ],
-    });
+    })
 
     const trackRecords = ref<TrackRecord[]>([
       {
-        type: "create",
-        action: "创建问题",
-        user: "李四",
-        time: "2026-02-10 10:30",
-        content: "用户反馈登录失败，请尽快处理",
-        environment: "test",
+        type: 'create',
+        action: '创建问题',
+        user: '李四',
+        time: '2026-02-10 10:30',
+        content: '用户反馈登录失败，请尽快处理',
+        environment: 'test',
       },
       {
-        type: "assign",
-        action: "分配问题",
-        user: "李四",
-        time: "2026-02-10 10:35",
-        content: "分配给张三处理",
+        type: 'assign',
+        action: '分配问题',
+        user: '李四',
+        time: '2026-02-10 10:35',
+        content: '分配给张三处理',
       },
       {
-        type: "process",
-        action: "开始处理",
-        user: "张三",
-        time: "2026-02-10 11:00",
-        content: "已定位问题原因：数据库连接池配置过小，高峰期连接不够",
+        type: 'process',
+        action: '开始处理',
+        user: '张三',
+        time: '2026-02-10 11:00',
+        content: '已定位问题原因：数据库连接池配置过小，高峰期连接不够',
       },
       {
-        type: "process",
-        action: "处理中",
-        user: "张三",
-        time: "2026-02-10 14:00",
-        content: "正在调整数据库连接池配置，从50调整到100",
+        type: 'process',
+        action: '处理中',
+        user: '张三',
+        time: '2026-02-10 14:00',
+        content: '正在调整数据库连接池配置，从50调整到100',
       },
       {
-        type: "submit",
-        action: "提交修复",
-        user: "张三",
-        time: "2026-02-10 14:20",
-        content: "已优化数据库连接池配置，增加连接数上限",
-        environment: "dev",
+        type: 'submit',
+        action: '提交修复',
+        user: '张三',
+        time: '2026-02-10 14:20',
+        content: '已优化数据库连接池配置，增加连接数上限',
+        environment: 'dev',
       },
       {
-        type: "verify",
-        action: "开发环境验证通过",
-        user: "王五",
-        time: "2026-02-10 15:00",
-        content: "开发环境验证通过，未发现异常",
+        type: 'verify',
+        action: '开发环境验证通过',
+        user: '王五',
+        time: '2026-02-10 15:00',
+        content: '开发环境验证通过，未发现异常',
       },
       {
-        type: "submit",
-        action: "提交测试环境验证",
-        user: "张三",
-        time: "2026-02-10 15:30",
-        content: "请在测试环境验证",
-        environment: "test",
+        type: 'submit',
+        action: '提交测试环境验证',
+        user: '张三',
+        time: '2026-02-10 15:30',
+        content: '请在测试环境验证',
+        environment: 'test',
       },
       {
-        type: "reject",
-        action: "测试环境验证未通过",
-        user: "测试小王",
-        time: "2026-02-10 16:00",
-        content: "高峰期仍有问题，连接超时错误仍然存在",
-        environment: "test",
-        rejectFrom: "test",
-        rejectReason: "高峰期仍偶发500错误，需要进一步优化",
+        type: 'reject',
+        action: '测试环境验证未通过',
+        user: '测试小王',
+        time: '2026-02-10 16:00',
+        content: '高峰期仍有问题，连接超时错误仍然存在',
+        environment: 'test',
+        rejectFrom: 'test',
+        rejectReason: '高峰期仍偶发500错误，需要进一步优化',
       },
       {
-        type: "process",
-        action: "继续处理",
-        user: "张三",
-        time: "2026-02-10 16:30",
-        content: "增加连接池最小连接数配置，调整为20-150",
+        type: 'process',
+        action: '继续处理',
+        user: '张三',
+        time: '2026-02-10 16:30',
+        content: '增加连接池最小连接数配置，调整为20-150',
       },
-    ]);
+    ])
 
     const verifySteps = ref<VerifyStep[]>([
       {
-        name: "开发环境验证",
-        status: "completed",
-        operator: "王五",
-        completedAt: "2026-02-10 15:00",
-        comment: "通过",
+        name: '开发环境验证',
+        status: 'completed',
+        operator: '王五',
+        completedAt: '2026-02-10 15:00',
+        comment: '通过',
       },
       {
-        name: "测试环境验证",
-        status: "rejected",
-        operator: "测试小王",
-        completedAt: "2026-02-10 16:00",
-        comment: "高峰期仍有问题",
+        name: '测试环境验证',
+        status: 'rejected',
+        operator: '测试小王',
+        completedAt: '2026-02-10 16:00',
+        comment: '高峰期仍有问题',
       },
-      { name: "Beta环境验证", status: "pending", comment: "" },
-      { name: "线上环境验证", status: "pending", comment: "" },
-    ]);
+      { name: 'Beta环境验证', status: 'pending', comment: '' },
+      { name: '线上环境验证', status: 'pending', comment: '' },
+    ])
 
     const verifyForm = ref({
-      environment: "test",
-      result: "passed",
-      reason: "",
-      comment: "",
-    });
+      environment: 'test',
+      result: 'passed',
+      reason: '',
+      comment: '',
+    })
 
     const addToTodo = () => {
-      console.log("添加到待办");
-    };
+      console.log('添加到待办')
+    }
 
     const submitVerify = () => {
-      console.log("提交验证:", verifyForm.value);
-      showVerifyModal.value = false;
-    };
+      console.log('提交验证:', verifyForm.value)
+      showVerifyModal.value = false
+    }
 
     return {
       showEditModal,
@@ -492,9 +465,9 @@ export default defineComponent({
       verifyForm,
       addToTodo,
       submitVerify,
-    };
+    }
   },
-});
+})
 </script>
 
 <style lang="less" scoped>
@@ -697,7 +670,7 @@ export default defineComponent({
     padding-bottom: 20px;
 
     &:not(:last-child)::before {
-      content: "";
+      content: '';
       position: absolute;
       left: 15px;
       top: 32px;
@@ -1113,7 +1086,7 @@ export default defineComponent({
     gap: 8px;
     cursor: pointer;
 
-    input[type="radio"] {
+    input[type='radio'] {
       width: 18px;
       height: 18px;
     }
@@ -1144,7 +1117,7 @@ export default defineComponent({
     border-color: #00c4c4;
   }
 
-  input[type="file"] {
+  input[type='file'] {
     position: absolute;
     top: 0;
     left: 0;

@@ -5,17 +5,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import MainLayout from "./layouts/MainLayout.vue";
+import { defineComponent } from 'vue'
+import MainLayout from './layouts/MainLayout.vue'
 
 export default defineComponent({
-  name: "App",
+  name: 'App',
   components: {
     MainLayout,
   },
-});
+})
 </script>
 
 <style lang="less">
-@import "./assets/styles/global.less";
+@import './assets/styles/global.less';
 </style>
